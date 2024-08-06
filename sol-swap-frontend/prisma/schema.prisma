@@ -3,17 +3,35 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 model User {
-  id            String   @id @default(uuid())
-  userName      String   @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  clerkId       String   @unique
-  email         String   @unique
-  isPro         Boolean  @default(false)
+  id          String     @id @default(uuid())
+  username    String     @unique
+  password    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  clerkId     String     @unique
+  solWallet   SolWallet?
+  inrWallet   INRWallet?
+  solWalletId String?
+  inrWalletId String?
+}
+
+model INRWallet {
+  id      String @id @default(uuid())
+  balance Int
+  userId  String @unique
+  user    User   @relation(fields: [userId], references: [id])
+}
+
+model SolWallet {
+  id         String @id @default(uuid())
+  publicKey  String
+  privateKey String
+  userId     String @unique
+  user       User   @relation(fields: [userId], references: [id])
 }

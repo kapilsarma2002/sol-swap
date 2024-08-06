@@ -1,10 +1,15 @@
 import { prisma } from '@/utils/db'
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { Keypair} from '@solana/web3.js'
 
 const createNewUser = async () => {
   const user = await currentUser()
-  // console.log('user: ', user)
+  const keypair = Keypair.generate()
+  const publicKey = keypair.publicKey.toBase58()
+  const privateKey = keypair.secretKey
+
+  console.log('user: ', user)
 
   const match = await prisma.user.findUnique({
     where: {
@@ -15,9 +20,19 @@ const createNewUser = async () => {
   if (!match) {
     await prisma.user.create({
       data: {
-        clerkId: user?.id || '',
-        userName: user?.username || '',
-        email: user?.emailAddresses[0]?.emailAddress || '',
+        clerkId: user?.id ?? '',
+        username: user?.emailAddresses[0].emailAddress ?? '',
+        solWallet: {
+          create: {
+            publicKey: publicKey,
+            privateKey: privateKey.toString(),
+          }
+        },
+        inrWallet: {
+          create: {
+            balance: 0
+          }
+        }
       },
     })
   }
