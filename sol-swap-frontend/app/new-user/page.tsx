@@ -21,7 +21,9 @@ const createNewUser = async () => {
     await prisma.user.create({
       data: {
         clerkId: user?.id ?? '',
-        username: user?.emailAddresses[0].emailAddress ?? '',
+        name: user?.firstName + ' ' + user?.lastName,
+        email: user?.emailAddresses[0].emailAddress ?? '',
+        profilePicture: user?.imageUrl,
         solWallet: {
           create: {
             publicKey: publicKey,
