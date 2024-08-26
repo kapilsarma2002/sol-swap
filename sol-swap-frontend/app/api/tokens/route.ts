@@ -6,7 +6,6 @@ import {
 } from '@solana/spl-token'
 import { connection, getSupportedTokens } from '@/utils/constants'
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
-import { TokenAccountNotFoundError } from '@solana/spl-token'
 
 export const GET = async (req: NextRequest) => {
   const { searchParams } = new URL(req.url)
@@ -18,13 +17,13 @@ export const GET = async (req: NextRequest) => {
 
   const tokens = supportedTokens.map((token, index) => ({
       ...token,
-      balance: balances[index],
-      USDBalance: balances[index] * Number(token.price),
+      balance: balances[index].toFixed(2),
+      USDBalance: (balances[index] * Number(token.price)).toFixed(2),
     }))
 
   return NextResponse.json({
     tokens,
-    totalBalance: tokens.reduce((acc, token) => acc + token.USDBalance, 0),
+    totalBalance: tokens.reduce((acc, token) => acc + Number(token.USDBalance), 0).toFixed(2),
   })
 }
 

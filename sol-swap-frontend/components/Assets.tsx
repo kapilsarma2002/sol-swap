@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react'
 import { NFTSelector, getUserNFTs } from '@/components/NFT'
 import { Connection } from '@solana/web3.js'
 import { MetadataKey } from '@nfteyez/sol-rayz/dist/config/metaplex'
+import { useTokens } from '@/app/api/tokens/hooks/useTokens'
+import { Spinner } from '@nextui-org/react'
+import TokenList from './TokenLIst'
 
 type NFT = {
   mint: string
@@ -25,11 +28,13 @@ type NFT = {
 
 const connection = new Connection('https://api.devnet.solana.com', 'confirmed')
 
-const Assets = ({ publicKey }: {publicKey: string}) => {
+const Assets = ({ publicKey }: { publicKey: string }) => {
   const [copied, setCopied] = useState(false)
   const [selectedNFT, setSelectedNFT] = useState(null)
   const [nfts, setNfts] = useState<NFT[]>([])
   const [selectedToken, setSelectedToken] = useState(null)
+  const [activeTab, setActiveTab] = useState('tokens')
+  const { tokenBalances, loading } = useTokens(publicKey)
 
   useEffect(() => {
     const getNFTs = async () => {
@@ -52,6 +57,14 @@ const Assets = ({ publicKey }: {publicKey: string}) => {
     }
   }, [copied])
 
+  if (loading) {
+    return (
+      <div className="flex flex-row items-center justify-center">
+        <Spinner label="loading..." color="default" labelColor="foreground" />
+      </div>
+    )
+  }
+
   const handleSelectedNFT = (nft: any) => {
     setSelectedNFT(nft)
     console.log('Selected NFT:', nft)
@@ -71,12 +84,14 @@ const Assets = ({ publicKey }: {publicKey: string}) => {
       Account assets
       <br />
       <div className="flex justify-between">
-        <div>
-          <h2 className="text-lg">NFTs</h2>
-          <NFTSelector nfts={nfts} onSelect={handleSelectedNFT} />
-        </div>
+        <span className='mt-2'>
+          <span className="text-black font-bold text-5xl">
+            ${tokenBalances?.totalBalance}
+            <span className="text-slate-500 text-3xl"> USD</span>
+          </span>
+        </span>
         <button
-          className="bg-slate-100 p-2 rounded-2xl"
+          className="bg-slate-100 p-2 rounded-xl"
           onClick={() => {
             navigator.clipboard.writeText(publicKey)
             setCopied(true)
@@ -85,30 +100,59 @@ const Assets = ({ publicKey }: {publicKey: string}) => {
           {copied ? 'Copied!' : 'Your wallet address'}
         </button>
       </div>
-      {selectedNFT && (
-        <div className="mt-4">
-          <h3 className='text-black'>Selected NFT:</h3>
-          <p>{selectedNFT}</p>
-          {/* Add more details about the selected NFT as needed */}
+      <div className="mt-4">
+        <div className="flex space-x-4">
+          <button
+            className={`p-2 ${
+              activeTab === 'tokens' ? 'bg-slate-100' : 'bg-white'
+            } rounded-lg`}
+            onClick={() => setActiveTab('tokens')}
+          >
+            Tokens
+          </button>
+          <button
+            className={`p-2 ${
+              activeTab === 'nfts' ? 'bg-slate-100' : 'bg-white'
+            } rounded-lg`}
+            onClick={() => setActiveTab('nfts')}
+          >
+            NFTs
+          </button>
         </div>
-      )}
-      <div>
-        <h2 className="text-lg text-black">Select Token</h2>
-        <TokenSelector onSelect={handleSelectedToken} />
+
+        {activeTab === 'tokens' && (
+          <div>
+            <TokenList tokens={tokenBalances?.tokens ?? []} />
+          </div>
+        )}
+
+        {activeTab === 'nfts' && (
+          <div>
+            <h2 className="text-lg text-black">NFTs</h2>
+            <NFTSelector nfts={nfts} onSelect={handleSelectedNFT} />
+            {selectedNFT && (
+              <div className="mt-4">
+                <h3 className="text-black">Selected NFT:</h3>
+                <p>{selectedNFT}</p>
+                {/* Render selected NFT details here */}
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      {selectedNFT && selectedToken && (
+      {/* {selectedNFT && selectedToken && (
         <button
           className="bg-red-500 text-white p-2 rounded-2xl mt-4"
           onClick={() => liquidateNFT(selectedNFT, selectedToken)}
         >
           Liquidate NFT
         </button>
-      )}
+      )} */}
     </div>
   )
 }
 
-const TokenSelector = ({ onSelect }: {onSelect: any}) => {
+const TokenSelector = ({ onSelect }: { onSelect: any }) => {
   const tokens = ['SOL', 'USDC', 'USDT']
   return (
     <select

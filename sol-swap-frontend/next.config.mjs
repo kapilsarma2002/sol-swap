@@ -8,8 +8,26 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 's2.coinmarketcap.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'icons.iconarchive.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 's3.coinmarketcap.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 }
 
-export default nextConfig;
+export default nextConfig

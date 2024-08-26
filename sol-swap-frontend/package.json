@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^5.2.12",
+    "@nextui-org/react": "^2.4.6",
     "@nfteyez/sol-rayz": "^0.10.2",
     "@prisma/client": "^5.17.0",
     "@solana/spl-token": "^0.4.8",
