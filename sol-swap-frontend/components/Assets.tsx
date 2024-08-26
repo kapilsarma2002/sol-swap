@@ -1,48 +1,40 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { NFTSelector, getUserNFTs } from '@/components/NFT'
-import { Connection } from '@solana/web3.js'
-import { MetadataKey } from '@nfteyez/sol-rayz/dist/config/metaplex'
+// import { getUserNFTs,  } from '@/components/NFT'
+import { connection } from '@/utils/constants'
+// import { MetadataKey } from '@nfteyez/sol-rayz/dist/config/metaplex'
 import { useTokens } from '@/app/api/tokens/hooks/useTokens'
 import { Spinner } from '@nextui-org/react'
+import { fetchNFTs } from '@/components/NFT'
 import TokenList from './TokenLIst'
 
-type NFT = {
+export interface NFT {
   mint: string
-  updateAuthority: string
-  data: {
-    creators: any[]
-    name: string
-    symbol: string
-    uri: string
-    sellerFeeBasisPoints: number
-  }
-  key: MetadataKey
-  primarySaleHappened: boolean
-  isMutable: boolean
-  editionNonce: number
-  masterEdition?: string
-  edition?: string
+  name: string
+  symbol: string
+  uri: string
 }
-
-const connection = new Connection('https://api.devnet.solana.com', 'confirmed')
 
 const Assets = ({ publicKey }: { publicKey: string }) => {
   const [copied, setCopied] = useState(false)
   const [selectedNFT, setSelectedNFT] = useState(null)
   const [nfts, setNfts] = useState<NFT[]>([])
+  const [loadingNFTs, setLoadingNFTs] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [selectedToken, setSelectedToken] = useState(null)
   const [activeTab, setActiveTab] = useState('tokens')
   const { tokenBalances, loading } = useTokens(publicKey)
 
   useEffect(() => {
-    const getNFTs = async () => {
-      const fetchedNFTs = await getUserNFTs(publicKey, connection)
-      setNfts(fetchedNFTs)
+    if (publicKey) {
+      setLoadingNFTs(true)
+      setError(null)
+      fetchNFTs(publicKey, connection)
+        .then(setNfts)
+        .catch((err) => setError(err.message))
+        .finally(() => setLoadingNFTs(false))
     }
-
-    getNFTs()
   }, [publicKey])
 
   useEffect(() => {
@@ -65,6 +57,18 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
     )
   }
 
+  if (loadingNFTs)
+    return (
+      <div className="flex flex-row items-center justify-center">
+        <Spinner
+          label="loading NFTs..."
+          color="default"
+          labelColor="foreground"
+        />
+      </div>
+    )
+  if (error) return <div>Error loading NFTs: {error}</div>
+
   const handleSelectedNFT = (nft: any) => {
     setSelectedNFT(nft)
     console.log('Selected NFT:', nft)
@@ -84,7 +88,7 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
       Account assets
       <br />
       <div className="flex justify-between">
-        <span className='mt-2'>
+        <span className="mt-2">
           <span className="text-black font-bold text-5xl">
             ${tokenBalances?.totalBalance}
             <span className="text-slate-500 text-3xl"> USD</span>
@@ -128,14 +132,17 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
 
         {activeTab === 'nfts' && (
           <div>
-            <h2 className="text-lg text-black">NFTs</h2>
-            <NFTSelector nfts={nfts} onSelect={handleSelectedNFT} />
-            {selectedNFT && (
-              <div className="mt-4">
-                <h3 className="text-black">Selected NFT:</h3>
-                <p>{selectedNFT}</p>
-                {/* Render selected NFT details here */}
-              </div>
+            <h2>Your NFTs</h2>
+            {nfts.length === 0 ? (
+              <p>No NFTs found for this wallet.</p>
+            ) : (
+              nfts.map((nft) => (
+                <div key={nft.mint}>
+                  <p>Name: {nft.name}</p>
+                  <p>Symbol: {nft.symbol}</p>
+                  <p>Mint: {nft.mint}</p>
+                </div>
+              ))
             )}
           </div>
         )}

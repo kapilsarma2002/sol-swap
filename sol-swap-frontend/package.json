@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^5.2.12",
+    "@metaplex-foundation/js": "^0.20.1",
     "@nextui-org/react": "^2.4.6",
-    "@nfteyez/sol-rayz": "^0.10.2",
     "@prisma/client": "^5.17.0",
     "@solana/spl-token": "^0.4.8",
     "@solana/web3.js": "^1.95.2",
