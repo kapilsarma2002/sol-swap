@@ -22,9 +22,7 @@ import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 //   )
 // }
 
-
 export async function fetchNFTs(publicKey: string, connection: any) {
-
   try {
     const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
       new PublicKey(publicKey),
@@ -58,11 +56,16 @@ export async function fetchNFTs(publicKey: string, connection: any) {
           const metadataAccount = await connection.getAccountInfo(metadataPDA)
           if (metadataAccount) {
             const [metadata] = Metadata.deserialize(metadataAccount.data)
+            const metadataJson = await fetch(metadata.data.uri).then((res) =>
+              res.json()
+            )
+
             return {
               mint: tokenMint.toString(),
               name: metadata.data.name,
               symbol: metadata.data.symbol,
               uri: metadata.data.uri,
+              image: metadataJson.image,
             }
           }
         } catch (error) {
