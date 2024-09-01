@@ -1,17 +1,31 @@
 'use client'
-import { getUserByClerkID } from '@/utils/auth'
-import { prisma } from '@/utils/db'
+
 import React, { useState } from 'react'
 import axios from 'axios'
+import bs58 from 'bs58'
 
 const Key = () => {
   const [publicKey, setPublicKey] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
 
   const handleInputChange = (event: any) => {
     setPublicKey(event.target.value)
   }
 
+  const isValidPublicKey = (key: string): boolean => {
+    try {
+      const decoded = bs58.decode(key)
+      return decoded.length === 32
+    } catch (e) {
+      return false
+    }
+  }
+
   const postKey = async () => {
+    if (!isValidPublicKey(publicKey)) {
+      setError('Invalid public key')
+      return
+    }
     try {
       await axios.post(`/api/key?key=${publicKey}`)
       window.location.reload()
@@ -31,6 +45,7 @@ const Key = () => {
           value={publicKey}
           onChange={handleInputChange}
         />
+        {error && <span className="text-red-500 ml-2">{error}</span>}
       </div>
       <div>
         <button className="bg-slate-100 p-2 rounded-xl" onClick={postKey}>

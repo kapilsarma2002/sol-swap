@@ -84,18 +84,18 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
   }
 
   return (
-    <div className="text-slate-500 mt-4">
+    <div className="text-slate-500 mt-8">
       Account assets
       <br />
       <div className="flex justify-between">
-        <span className="mt-2">
+        <span className="mt-4">
           <span className="text-black font-bold text-5xl">
             ${tokenBalances?.totalBalance}
             <span className="text-slate-500 text-3xl"> USD</span>
           </span>
         </span>
         <button
-          className="bg-slate-100 p-2 rounded-xl"
+          className="bg-slate-100 px-4 py-2 h-12 rounded-xl"
           onClick={() => {
             navigator.clipboard.writeText(publicKey)
             setCopied(true)

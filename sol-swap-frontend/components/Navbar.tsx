@@ -21,7 +21,7 @@ const Navbar = () => {
         className="font-bold text-2xl cursor-pointer"
         onClick={redirectToHome}
       >
-        SOLSwap
+        SOLView
       </h1>
       <div>
         <SignedOut>
