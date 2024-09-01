@@ -6,8 +6,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'SOL Swap',
-  description: 'Swap your NFTs to SOL',
+  title: 'SOL View',
+  description: 'View your the value of your tokens and NFTs in SOL',
 }
 
 export default function RootLayout({

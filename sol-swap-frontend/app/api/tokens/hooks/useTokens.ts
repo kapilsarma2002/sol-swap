@@ -1,4 +1,4 @@
-import { TokenDetails } from "@/utils/constants";
+import { TokenDetails } from "@/utils/tokens";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -7,7 +7,8 @@ export interface TokenWithBalance extends TokenDetails {
   USDBalance: string;
 }
 
-//9EN132cbfUDRKw5DmAU1fkweuXCVr3UPkr6sTuBYqvLC
+// 9EN132cbfUDRKw5DmAU1fkweuXCVr3UPkr6sTuBYqvLC
+// 8fCXUDCkvhEQkYNyMbsWgYsaqikorojdv2hgfezfvbdD
 export const useTokens = (address: string) => {
   const [tokenBalances, setTokenBalances] = useState<{
     totalBalance: number

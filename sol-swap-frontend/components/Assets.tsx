@@ -1,19 +1,19 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-// import { getUserNFTs,  } from '@/components/NFT'
 import { connection } from '@/utils/constants'
-// import { MetadataKey } from '@nfteyez/sol-rayz/dist/config/metaplex'
 import { useTokens } from '@/app/api/tokens/hooks/useTokens'
 import { Spinner } from '@nextui-org/react'
 import { fetchNFTs } from '@/components/NFT'
 import TokenList from './TokenLIst'
+import SwapTokens from './SwapTokens'
 
 export interface NFT {
   mint: string
   name: string
   symbol: string
   uri: string
+  image: string
 }
 
 const Assets = ({ publicKey }: { publicKey: string }) => {
@@ -22,7 +22,7 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
   const [nfts, setNfts] = useState<NFT[]>([])
   const [loadingNFTs, setLoadingNFTs] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [selectedToken, setSelectedToken] = useState(null)
+  const [selectedToken, setSelectedToken] = useState('SOL')
   const [activeTab, setActiveTab] = useState('tokens')
   const { tokenBalances, loading } = useTokens(publicKey)
 
@@ -122,6 +122,14 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
           >
             NFTs
           </button>
+          <button
+            className={`p-2 ${
+              activeTab === 'swap' ? 'bg-slate-100' : 'bg-white'
+            } rounded-lg`}
+            onClick={() => setActiveTab('swap')}
+          >
+            Swap
+          </button>
         </div>
 
         {activeTab === 'tokens' && (
@@ -131,19 +139,41 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
         )}
 
         {activeTab === 'nfts' && (
-          <div>
-            <h2>Your NFTs</h2>
+          <div className="p-3">
             {nfts.length === 0 ? (
               <p>No NFTs found for this wallet.</p>
             ) : (
               nfts.map((nft) => (
-                <div key={nft.mint}>
-                  <p>Name: {nft.name}</p>
-                  <p>Symbol: {nft.symbol}</p>
-                  <p>Mint: {nft.mint}</p>
+                <div key={nft.mint} className="flex justify-between">
+                  <div className="flex flex-col justify-start">
+                    <p>
+                      <span className="font-bold">Name:</span> {nft.name}
+                    </p>
+                    <p>
+                      <span className="font-bold">Symbol:</span> {nft.symbol}
+                    </p>
+                    <img
+                      className="m-2"
+                      src={nft.image}
+                      alt={nft.name}
+                      height={150}
+                      width={150}
+                    />
+                    <p>
+                      <span className="font-bold">Mint:</span> {nft.mint}
+                    </p>
+                  </div>
+                  <button className="bg-slate-100 p-2 h-10 rounded-lg">
+                    Liquidate
+                  </button>
                 </div>
               ))
             )}
+          </div>
+        )}
+        {activeTab === 'swap' && (
+          <div>
+            <SwapTokens tokenBalances={tokenBalances} />
           </div>
         )}
       </div>
