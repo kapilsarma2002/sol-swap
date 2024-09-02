@@ -9,7 +9,7 @@ const createNewUser = async () => {
   const publicKey = keypair.publicKey.toBase58()
   const privateKey = keypair.secretKey
 
-  console.log('user: ', user)
+  // console.log('user: ', user)
 
   const match = await prisma.user.findUnique({
     where: {
