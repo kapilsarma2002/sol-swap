@@ -8,18 +8,10 @@ import { fetchNFTs } from '@/components/NFT'
 import TokenList from './TokenLIst'
 import SwapTokens from './SwapTokens'
 
-export interface NFT {
-  mint: string
-  name: string
-  symbol: string
-  uri: string
-  image: string
-}
-
 const Assets = ({ publicKey }: { publicKey: string }) => {
   const [copied, setCopied] = useState(false)
   const [selectedNFT, setSelectedNFT] = useState(null)
-  const [nfts, setNfts] = useState<NFT[]>([])
+  const [nfts, setNfts] = useState<any[]>([])
   const [loadingNFTs, setLoadingNFTs] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedToken, setSelectedToken] = useState('SOL')
@@ -27,14 +19,23 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
   const { tokenBalances, loading } = useTokens(publicKey)
 
   useEffect(() => {
-    if (publicKey) {
-      setLoadingNFTs(true)
-      setError(null)
-      fetchNFTs(publicKey, connection)
-        .then(setNfts)
-        .catch((err) => setError(err.message))
-        .finally(() => setLoadingNFTs(false))
+
+    const getNFTs = async () => {
+
+      if (publicKey) {
+        setLoadingNFTs(true)
+        setError(null)
+        const res = await fetchNFTs(publicKey, connection)
+        // res.map((nft: any) => {
+
+        // })
+        // console.log('res nft is : ', res)
+        setNfts(res.data)
+        setLoadingNFTs(false)
+      }
     }
+
+    getNFTs()
   }, [publicKey])
 
   useEffect(() => {
@@ -71,7 +72,7 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
 
   const handleSelectedNFT = (nft: any) => {
     setSelectedNFT(nft)
-    console.log('Selected NFT:', nft)
+    // console.log('Selected NFT:', nft)
   }
 
   const handleSelectedToken = (token: any) => {
@@ -80,7 +81,7 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
 
   const liquidateNFT = (nft: any, token: any) => {
     // This is a placeholder. You'll need to implement the actual interaction with your smart contract here.
-    console.log(`Liquidating NFT: ${nft} for token: ${token}`)
+    // console.log(`Liquidating NFT: ${nft} for token: ${token}`)
   }
 
   return (
@@ -122,14 +123,14 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
           >
             NFTs
           </button>
-          <button
+          {/* <button
             className={`p-2 ${
               activeTab === 'swap' ? 'bg-slate-100' : 'bg-white'
             } rounded-lg`}
             onClick={() => setActiveTab('swap')}
           >
             Swap
-          </button>
+          </button> */}
         </div>
 
         {activeTab === 'tokens' && (
@@ -139,33 +140,40 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
         )}
 
         {activeTab === 'nfts' && (
-          <div className="p-3">
+          <div className="p-3 overflow-y-auto max-h-96">
             {nfts.length === 0 ? (
               <p>No NFTs found for this wallet.</p>
             ) : (
               nfts.map((nft) => (
-                <div key={nft.mint} className="flex justify-between">
+                <div
+                  key={nft.assets[0].block_number}
+                  className="flex border border-slate-200 p-4 rounded-xl justify-between"
+                >
                   <div className="flex flex-col justify-start">
                     <p>
-                      <span className="font-bold">Name:</span> {nft.name}
+                      <span className="font-bold">Name:</span>{' '}
+                      {nft.assets[0].name || 'no name'}
                     </p>
-                    <p>
+                    {/* <p>
                       <span className="font-bold">Symbol:</span> {nft.symbol}
-                    </p>
+                    </p> */}
                     <img
                       className="m-2"
-                      src={nft.image}
-                      alt={nft.name}
+                      src={nft.logo_url}
+                      alt={nft.collection}
                       height={150}
                       width={150}
                     />
-                    <p>
+                    {/* <p>
                       <span className="font-bold">Mint:</span> {nft.mint}
-                    </p>
+                    </p> */}
                   </div>
-                  <button className="bg-slate-100 p-2 h-10 rounded-lg">
+                  {/* <button className="bg-slate-100 p-2 h-10 rounded-lg">
                     Liquidate
-                  </button>
+                  </button> */}
+                  <div className="text-black font-bold text-3xl">
+                    {nft.assets[0].mint_price || nft.assets[0].latest_trade_price}
+                  </div>
                 </div>
               ))
             )}

@@ -26,7 +26,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         }
       })
 
-      console.log('User wallet updated:', userWallet)
+      // console.log('User wallet updated:', userWallet)
       return NextResponse.json({ res: userWallet})
     } else {
       console.error('User not found')

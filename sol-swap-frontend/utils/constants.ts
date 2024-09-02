@@ -36,4 +36,4 @@ export const getSupportedTokens = async () => {
   }))
 }
 
-getSupportedTokens();
+getSupportedTokens()
