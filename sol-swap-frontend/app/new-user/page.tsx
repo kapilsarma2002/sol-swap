@@ -11,30 +11,33 @@ const createNewUser = async () => {
 
   // console.log('user: ', user)
 
-  const match = await prisma.user.findUnique({
-    where: {
-      clerkId: user?.id as string,
-    },
-  })
-
-  if (!match) {
-    await prisma.user.create({
-      data: {
-        clerkId: user?.id ?? '',
-        name: user?.firstName + ' ' + user?.lastName,
-        email: user?.emailAddresses[0].emailAddress ?? '',
-        profilePicture: user?.imageUrl,
-        solWallet: {
-          create: {
-            publicKey: publicKey,
-            privateKey: privateKey.toString(),
-          }
-        },
+  try {
+    const match = await prisma.user.findUnique({
+      where: {
+        clerkId: user?.id as string,
       },
     })
-  }
 
-  redirect('/home')
+    if (!match) {
+      await prisma.user.create({
+        data: {
+          clerkId: user?.id ?? '',
+          name: user?.firstName + ' ' + user?.lastName,
+          email: user?.emailAddresses[0].emailAddress ?? '',
+          profilePicture: user?.imageUrl,
+          solWallet: {
+            create: {
+              publicKey: publicKey,
+              privateKey: privateKey.toString(),
+            },
+          },
+        },
+      })
+    }
+    redirect('/home')
+  } catch (error) {
+    console.error('Error creating user:', error)
+  }
 }
 
 const NewUser = async () => {
