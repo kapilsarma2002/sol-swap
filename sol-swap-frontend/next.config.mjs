@@ -35,6 +35,9 @@ const nextConfig = {
     ignoreDuringBuilds: true,
     ignoreBuildErrors: true,
   },
+  experimental: {
+    unstable_allowDynamic: true,
+  },
 }
 
 export default nextConfig
