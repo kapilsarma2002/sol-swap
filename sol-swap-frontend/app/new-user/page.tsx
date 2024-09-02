@@ -1,7 +1,7 @@
 import { prisma } from '@/utils/db'
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { Keypair} from '@solana/web3.js'
+import { Keypair } from '@solana/web3.js'
 
 const createNewUser = async () => {
   const user = await currentUser()
@@ -11,33 +11,29 @@ const createNewUser = async () => {
 
   // console.log('user: ', user)
 
-  try {
-    const match = await prisma.user.findUnique({
-      where: {
-        clerkId: user?.id as string,
-      },
-    })
+  const match = await prisma.user.findUnique({
+    where: {
+      clerkId: user?.id as string,
+    },
+  })
 
-    if (!match) {
-      await prisma.user.create({
-        data: {
-          clerkId: user?.id ?? '',
-          name: user?.firstName + ' ' + user?.lastName,
-          email: user?.emailAddresses[0].emailAddress ?? '',
-          profilePicture: user?.imageUrl,
-          solWallet: {
-            create: {
-              publicKey: publicKey,
-              privateKey: privateKey.toString(),
-            },
+  if (!match) {
+    await prisma.user.create({
+      data: {
+        clerkId: user?.id ?? '',
+        name: user?.firstName + ' ' + user?.lastName,
+        email: user?.emailAddresses[0].emailAddress ?? '',
+        profilePicture: user?.imageUrl,
+        solWallet: {
+          create: {
+            publicKey: publicKey,
+            privateKey: privateKey.toString(),
           },
         },
-      })
-    }
-    redirect('/home')
-  } catch (error) {
-    console.error('Error creating user:', error)
+      },
+    })
   }
+  redirect('/home')
 }
 
 const NewUser = async () => {
