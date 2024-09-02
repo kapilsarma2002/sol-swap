@@ -1,6 +1,6 @@
 import { prisma } from '@/utils/db'
 import { currentUser } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 import { Keypair} from '@solana/web3.js'
 
 const createNewUser = async () => {
@@ -8,7 +8,7 @@ const createNewUser = async () => {
   const keypair = Keypair.generate()
   const publicKey = keypair.publicKey.toBase58()
   const privateKey = keypair.secretKey
-
+  const router = useRouter()
   // console.log('user: ', user)
 
   try {
@@ -34,7 +34,8 @@ const createNewUser = async () => {
         },
       })
     }
-    redirect('/home')
+    // redirect('/home')
+    router.push('/home')
   } catch (error) {
     console.error('Error creating user:', error)
   }
