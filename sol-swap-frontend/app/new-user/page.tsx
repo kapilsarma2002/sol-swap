@@ -30,11 +30,6 @@ const createNewUser = async () => {
             privateKey: privateKey.toString(),
           }
         },
-        inrWallet: {
-          create: {
-            balance: 0
-          }
-        }
       },
     })
   }
